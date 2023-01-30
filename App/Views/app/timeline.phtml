@@ -58,10 +58,19 @@
 		<div class="col-md-6">
 			<div class="row mb-2">
 				<div class="col tweetBox">
-					<form method="post" action="/tweet">
+					<form method="post" action="/tweet" enctype="multipart/form-data">
 						<textarea class="form-control" name="tweet" id="exampleFormControlTextarea1" rows="3"></textarea>
-						
+						<input type="file" name="arquivo" id="">
+
+						<?php if (isset($_GET['img_erro']) && $_GET['img_erro'] == 'formatoInvalido') { ?>
+							<p class="text-danger text-formted">Tipo de formato inválido!!! Por favor, adicione um png ou jpg.</p>
+						<?php } ?>
+						<?php if (isset($_GET['img_erro']) && $_GET['img_erro'] == 'tamanhoMaximoUltrapassado') { ?>
+							<p class="text-danger text-formted">MAX: 2mb</p>
+						<?php } ?>
+
 						<div class="col mt-2 d-flex justify-content-end">
+							
 							<button type="submit"  class="btn btn-primary">Tweet</button>
 						</div>
 
@@ -73,7 +82,13 @@
 			<div class="row tweet">
 				<div class="col">
 					<p><strong><?php echo $tweet['nome'] ?></strong> <span class="text text-muted">- <?php echo $tweet['data'] ?></span></p>
-					<p><?php echo $tweet['tweet']?></p>
+					<p><?php echo $tweet['tweet']?> </p>
+
+					<?php if ($tweet['path_imagem'] != null  ) { ?>
+						<img width="350px" src="<?php echo $tweet['path_imagem'] ?>" alt=""><br/>
+						<a href="<?php echo $tweet['path_imagem']  ?>" target="_blank" rel="noopener noreferrer">Ver imagem -> </a>
+
+					<?php } ?>
 
 					<br />
 					<?php if($tweet['id_usuario'] == $_SESSION['id']){ ?>
@@ -96,6 +111,7 @@
 				<span class="quemSeguirTitulo">Quem seguir</span><br />
 				<hr />
 				<a href="\quemSeguir" class="quemSeguirTxt">Procurar por pessoas conhecidas</a>
+				<!-- <a href="/img/img.png">IMG </a> -->
 			</div>
 		</div>
 

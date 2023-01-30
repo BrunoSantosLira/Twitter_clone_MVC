@@ -9,6 +9,7 @@ class Tweet extends Model{
     private $id_usuario;
     private $data;
     private $tweet;
+    private $path_img;
 
     public function __set($atributo, $valor){
         $this->$atributo = $valor;
@@ -20,10 +21,11 @@ class Tweet extends Model{
 
     //salvar
     public function salvar(){
-        $query = "INSERT INTO tweets(id_usuario,tweet)VALUES(:id_usuario, :tweet)";
+        $query = "INSERT INTO tweets(id_usuario,tweet,path_imagem)VALUES(:id_usuario, :tweet, :path_img)";
         $stmt = $this->db->prepare($query);
         $stmt->bindValue(':id_usuario', $this->__get('id_usuario'));
         $stmt->bindValue(':tweet', $this->__get('tweet'));
+        $stmt->bindValue(':path_img', $this->__get('path_img'));
         $stmt->execute();
 
         return $this;
@@ -41,7 +43,7 @@ class Tweet extends Model{
     public function getAll(){
         $query = 
         "SELECT
-        t.id, t.id_usuario, u.nome , t.tweet, DATE_FORMAT(t.data, '%d - %m -%Y- %H : %i') as data
+        t.id, t.id_usuario, u.nome , t.tweet, t.path_imagem, DATE_FORMAT(t.data, '%d - %m -%Y- %H : %i') as data
 
         FROM 
         tweets as t

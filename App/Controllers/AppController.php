@@ -28,13 +28,43 @@ class AppController extends Action{
     public function tweet(){
         session_start();
         $this->validarAutenticacao();
-            $tweet = Container::getModel('Tweet');
+        $tweet = Container::getModel('Tweet');
 
-            $tweet->__set('tweet', $_POST['tweet']);
-            $tweet->__set('id_usuario', $_SESSION['id']);
+        $tweet->__set('tweet', $_POST['tweet']);
+        $tweet->__set('id_usuario', $_SESSION['id']);
+
+        
+        $arquivo = $_FILES['arquivo'];
+        
+        //salvando imagens
+        echo '<pre>';
+        print_r($arquivo);
+        echo '</pre>';
+
+        $pasta = "img/";
+        $arquivo_nome = $arquivo['name'];
+        $novoNomeArquivo = uniqid();
+        $extensao = strtolower(pathinfo($arquivo_nome, PATHINFO_EXTENSION)); //formato do arquivo(.jpg,.pdf,.png ...)
+
+        if($extensao != 'png' && $extensao != 'jpg' && $arquivo['name']  != ''){
+            header('Location: /timeline?img_erro=formatoInvalido');
+            
+        }else if ($arquivo['size'] > 2097157 && $arquivo['name'] != ''){
+            header('Location: /timeline?img_erro=tamanhoMaximoUltrapassado');
+        }else {
+
+            $caminho = "$pasta$novoNomeArquivo.$extensao";
+
+            $deu_certo = move_uploaded_file($arquivo['tmp_name'], $pasta . $novoNomeArquivo . '.' . $extensao);
+            if ($deu_certo) {
+                $tweet->__set('path_img', $caminho);
+            }
+
+            //header("Location: /img/img.png"); endereço da imagem
 
             $tweet->salvar();
             header('Location: /timeline');
+        }
     }
 
     public function validarAutenticacao(){
