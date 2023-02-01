@@ -1,3 +1,12 @@
+input[type="file"]{
+    display: none;
+}
+label{
+    font-size: 30px;
+    padding-top: 5px;
+    cursor: pointer;
+}
+
 html, body {
   height: 100%;
 }

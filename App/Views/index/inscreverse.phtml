@@ -16,7 +16,7 @@
         <div class="row">
           <div class="col">
             
-            <form action="\registrar" method="post">
+            <form action="\registrar" method="post" enctype="multipart/form-data">
               <div class="form-group">
                 <input type="text" value="<?php echo $this->view->usuario['nome'] ?>" name="nome" class="form-control" placeholder="Nome">
               </div>
@@ -29,6 +29,34 @@
                 <input type="password" value="<?php echo $this->view->usuario['senha'] ?>" name="senha" class="form-control" placeholder="Senha">
               </div>
               
+              <div class="col text-center">
+                  Selecione sua foto:
+                  <div class="col">
+                      <img src="user_img/user_isolated.jpg" style="width: 100; height: 100;margin:0 auto; border-radius: 100px;">
+
+                  </div>
+                    
+                
+
+                  <label for="foto"> 
+							      <i class="fa-solid fa-image"></i>
+						      </label>
+						    <input type="file" name="foto" id="foto" value="SELECT">
+
+                  <?php if (isset($_GET['erro']) && $_GET['erro'] == 'tamanho' ) { ?>
+                    <p class=" form-text text-danger" >
+                        MAX: 2MB
+                    </p>
+                  <?php } ?>
+
+                  <?php if (isset($_GET['erro']) && $_GET['erro'] == 'extensao' ) { ?>
+                    <p class=" form-text text-danger">
+                        Permitido apenas arquivos .png ou .jpg
+                    </p>
+                  <?php } ?>
+
+              </div>
+
               <div class="mt-4 mb-4">
                 <small class="form-text">
                   Ao inscrever-se, você concorda com os Termos de Serviço e com as Políticas de Privacidade, incluindo o Uso de Cookies. Outras pessoas poderão encontrar você pelo e-mail ou número de telefone fornecido · Opções de Privacidade
@@ -36,11 +64,19 @@
               </div>
               <button type="submit" class="btn btn-primary btn-block">Inscrever-se</button>
             </form>
+
+
             <?php if ($this->view->errocadastro) { ?>
               <small class=" form-text text-danger">
                   Por favor, preencha corretamente o formulário!!
               </small>
             <?php } ?>
+
+          
+
+
+           
+
           </div>
         </div>
 

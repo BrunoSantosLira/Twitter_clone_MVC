@@ -17,16 +17,27 @@
 	<div class="row pt-2">
 		
 		<div class="col-md-3">
-
+			<!-- <img width="255px" height="95px" src="<?//php echo $this->view->foto_perfil['foto_perfil'] ?>" alt=""> -->
 			<div class="perfil">
-				<div class="perfilTopo">
+					<form method="post" enctype="multipart/form-data" action="\foto_edit?id=<?php echo $_SESSION['id'] ?>" class="text-center" >
+						<label for="arquivo"> 
+							<i class="fa-solid fa-pen"></i>
+						</label>
+						<input type="file" name="arquivo" id="arquivo" value="SELECT">
 
+							<div class="col d-flex justify-content-center">
+								<button type="submit" class="btn btn-dark" >Trocar</button>
+							</div>
+
+					</form>
+				<div class="text-center" style="margin-bottom: 15px;">
+					<img src="<?php echo $this->view->foto_perfil['foto_perfil'] ?>" style="width: 100; height: 100; border: 1px solid red; border-radius: 60px; padding:;">
 				</div>
-
+				
 				<div class="perfilPainel">
 					
 					<div class="row mt-2 mb-2">
-						<div class="col mb-2">
+						<div class="col mb-2 text-center">
 							<span class="perfilPainelNome"><?php echo $this->view->info_usuario['nome'] ?></span>
 						</div>
 					</div>
@@ -60,7 +71,10 @@
 				<div class="col tweetBox">
 					<form method="post" action="/tweet" enctype="multipart/form-data">
 						<textarea class="form-control" name="tweet" id="exampleFormControlTextarea1" rows="3"></textarea>
-						<input type="file" name="arquivo" id="">
+						<label for="arquivo"> 
+							<i class="fa-solid fa-image"></i>
+						</label>
+						<input type="file" name="arquivo" id="arquivo" value="SELECT">
 
 						<?php if (isset($_GET['img_erro']) && $_GET['img_erro'] == 'formatoInvalido') { ?>
 							<p class="text-danger text-formted">Tipo de formato inválido!!! Por favor, adicione um png ou jpg.</p>
@@ -70,26 +84,32 @@
 						<?php } ?>
 
 						<div class="col mt-2 d-flex justify-content-end">
-							
+				
 							<button type="submit"  class="btn btn-primary">Tweet</button>
 						</div>
 
 					</form>
 				</div>
 			</div>
+			<?php
+			echo '<pre>';
+			echo '</pre>'; ?>
 
 			<?php foreach ($this->view->tweets as $key => $tweet) { ?>
 			<div class="row tweet">
 				<div class="col">
-					<p><strong><?php echo $tweet['nome'] ?></strong> <span class="text text-muted">- <?php echo $tweet['data'] ?></span></p>
-					<p><?php echo $tweet['tweet']?> </p>
+					<p>
+						<!-- Foto do perfil --><img style="width: 50px; height: 50px; border-radius:25px;" src="<?php echo $tweet['foto_perfil'] ?>" alt="">
 
+						<strong><?php echo $tweet['nome'] ?></strong> <span class="text text-muted">- <?php echo $tweet['data'] ?></span>
+					</p>
+					<p><?php echo $tweet['tweet']?> </p>
 					<?php if ($tweet['path_imagem'] != null  ) { ?>
 						<img width="350px" src="<?php echo $tweet['path_imagem'] ?>" alt=""><br/>
 						<a href="<?php echo $tweet['path_imagem']  ?>" target="_blank" rel="noopener noreferrer">Ver imagem -> </a>
 
 					<?php } ?>
-
+						
 					<br />
 					<?php if($tweet['id_usuario'] == $_SESSION['id']){ ?>
 					<form method="post" action="\remover_tweet?id=<?php echo $tweet['id'] ?>">
@@ -98,11 +118,30 @@
 						</div>
 					</form>
 					<?php } ?>
-
+						
 				</div>
 			</div>
 			<?php } ?>
+			<div class="row">
+				<nav aria-label="...">
+					<ul class="pagination">
 
+						<li class="page-item"><a class="page-link" href="?pagina=1">Primeira</a></li>
+
+						<?php for ($i = 1; $i <= $this->view->total_paginas; $i++){ ?>
+							<li class="page-item <?php echo $this->view->pagina_ativa == $i ? 'active' : ''
+							 ?>">
+							 <a class="page-link" href="?pagina=<?php echo $i ?>"><?php echo $i ?></a>
+							</li>
+						<?php } ?>
+
+						<li class="page-item">
+						<a class="page-link"  href="?pagina=<?php echo  $this->view->total_paginas?>">Última</a>
+						</li>
+
+					</ul>
+				</nav>
+			</div>
 		</div>
 
 

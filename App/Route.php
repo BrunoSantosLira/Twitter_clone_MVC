@@ -68,6 +68,12 @@ class Route extends Bootstrap {
 			'action' => 'remover_tweet'
 		);
 
+		$routes['foto_edit'] = array(
+			'route' => '/foto_edit',
+			'controller' => 'AppController',
+			'action' => 'foto_edit'
+		);
+
 
 
 

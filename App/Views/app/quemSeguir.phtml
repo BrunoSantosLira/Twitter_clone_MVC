@@ -19,8 +19,8 @@
 		<div class="col-md-3">
 
 			<div class="perfil">
-				<div class="perfilTopo">
-
+				<div class="text-center">
+					<img src="<?php echo $this->view->foto_perfil['foto_perfil'] ?>" style="width: 100; height: 100; border: 1px solid red; border-radius: 60px;">
 				</div>
 
 				<div class="perfilPainel">
@@ -84,10 +84,11 @@
 							<div class="row">
 
 								<div class="col-md-6">
+			<!-- Foto do perfil -->	<img style="width: 50px; height: 50px; border-radius:25px;" src="<?php echo $usuario['foto_perfil'] ?>" alt="">
+
 									<?php echo $usuario['nome'] ?>
-					
 								</div>
-							
+								
 								<div class="col-md-6 d-flex justify-content-end">
 									<div>
 										<?php if($usuario['seguindo_sn'] == 0){ ?>
@@ -105,6 +106,11 @@
 				</div>
 			</div>
 			<?php } } ?>
+			<?php
+			echo '<pre>';
+			print_r($this->view->usuarios);
+			echo '</pre>'
+			?>
 
 		</div>
 	</div>

@@ -5,27 +5,51 @@ use MF\Controller\Action;
 use MF\Model\Container;
 
 
-class AppController extends Action{
+class AppController extends Action
+{
 
-    public function timeline(){
-   
+    public function timeline()
+    {
 
-            $this->validarAutenticacao();
+        $this->validarAutenticacao();
 
-            $tweet = Container::getModel('Tweet');
-            $tweet->__set('id_usuario' , $_SESSION['id']);
+        $tweet = Container::getModel('Tweet');
+        $tweet->__set('id_usuario', $_SESSION['id']);
 
-            $tweets = $tweet->getAll();
-            $this->view->tweets = $tweets;
+        $tweets = $tweet->getAll();
 
-            $this->getInfoUser();
+        $total_registros_pagina = 10;
+        $pagina = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+        $deslocamento = ($pagina - 1) * $total_registros_pagina; //expressão para calcular o deslocamento
 
-            $this->render('timeline');
-            
+
+        /*
+        $total_registros_pagina = 10;
+        $deslocamento = 10;
+        $pagina = 2;
+        
+        $total_registros_pagina = 10;
+        $deslocamento = 20;
+        $pagina = 3;*/
+
+        $tweets = $tweet->getPorPagina($total_registros_pagina, $deslocamento);
+        $total_tweets = $tweet->getTotalRegistros();
+        $this->view->total_paginas = ceil($total_tweets['total'] / $total_registros_pagina);
+        $this->view->pagina_ativa = $pagina;
+
+
+
+        $this->view->tweets = $tweets;
+
+        $this->getInfoUser();
+
+        $this->render('timeline');
+
 
     }
 
-    public function tweet(){
+    public function tweet()
+    {
         session_start();
         $this->validarAutenticacao();
         $tweet = Container::getModel('Tweet');
@@ -33,9 +57,9 @@ class AppController extends Action{
         $tweet->__set('tweet', $_POST['tweet']);
         $tweet->__set('id_usuario', $_SESSION['id']);
 
-        
+
         $arquivo = $_FILES['arquivo'];
-        
+
         //salvando imagens
         echo '<pre>';
         print_r($arquivo);
@@ -46,12 +70,12 @@ class AppController extends Action{
         $novoNomeArquivo = uniqid();
         $extensao = strtolower(pathinfo($arquivo_nome, PATHINFO_EXTENSION)); //formato do arquivo(.jpg,.pdf,.png ...)
 
-        if($extensao != 'png' && $extensao != 'jpg' && $arquivo['name']  != ''){
+        if ($extensao != 'png' && $extensao != 'jpg' && $arquivo['name'] != '') {
             header('Location: /timeline?img_erro=formatoInvalido');
-            
-        }else if ($arquivo['size'] > 2097157 && $arquivo['name'] != ''){
+
+        } else if ($arquivo['size'] > 2097157 && $arquivo['name'] != '') {
             header('Location: /timeline?img_erro=tamanhoMaximoUltrapassado');
-        }else {
+        } else {
 
             $caminho = "$pasta$novoNomeArquivo.$extensao";
 
@@ -67,34 +91,37 @@ class AppController extends Action{
         }
     }
 
-    public function validarAutenticacao(){
+    public function validarAutenticacao()
+    {
         session_start();
-        if(!isset($_SESSION['id']) || $_SESSION['id'] == '' || !isset($_SESSION['nome']) || $_SESSION['nome'] == '' ){
+        if (!isset($_SESSION['id']) || $_SESSION['id'] == '' || !isset($_SESSION['nome']) || $_SESSION['nome'] == '') {
             header('Location: /?login=erro');
         }
     }
 
-    public function quemSeguir(){
+    public function quemSeguir()
+    {
         $this->validarAutenticacao();
 
 
         $pesquisarPor = isset($_GET['pesquisarPor']) ? $_GET['pesquisarPor'] : '';
-        
-            $usuario = Container::getModel('Usuarios');
-            $usuario->__set('nome', $pesquisarPor);
-            $usuario->__set('id', $_SESSION['id']);
-            $usuarios =$usuario->getAll();
 
-        
+        $usuario = Container::getModel('Usuarios');
+        $usuario->__set('nome', $pesquisarPor);
+        $usuario->__set('id', $_SESSION['id']);
+        $usuarios = $usuario->getAll();
+
+
         $this->view->usuarios = $usuarios;
-        
+
 
         $this->getInfoUser();
 
         $this->render('quemSeguir');
     }
 
-    public function acao(){
+    public function acao()
+    {
         $this->validarAutenticacao();
 
         $acao = isset($_GET['acao']) ? $_GET['acao'] : '';
@@ -103,10 +130,10 @@ class AppController extends Action{
         $usuario = Container::getModel('Usuarios');
         $usuario->__set('id', $_SESSION['id']);
 
-        if($acao == 'seguir'){
+        if ($acao == 'seguir') {
             $usuario->seguirUsuario($id_usuario_seguindo);
         }
-        if($acao == 'deixar_de_seguir'){
+        if ($acao == 'deixar_de_seguir') {
             $usuario->deixarSeguirUsuario($id_usuario_seguindo);
         }
 
@@ -114,7 +141,8 @@ class AppController extends Action{
 
     }
 
-    public function remover_tweet(){
+    public function remover_tweet()
+    {
         $this->validarAutenticacao();
 
         $id_tweet = isset($_GET['id']) ? $_GET['id'] : '';
@@ -127,19 +155,61 @@ class AppController extends Action{
         header('Location: \timeline');
     }
 
-    public function getInfoUser(){
-            //informacoes do user
-            $usuarios = Container::getModel('Usuarios');
-            $usuarios->__set('id',$_SESSION['id']);
+    public function getInfoUser()
+    {
+        //informacoes do user
+        $usuarios = Container::getModel('Usuarios');
+        $usuarios->__set('id', $_SESSION['id']);
 
-            //dados do user
-            $this->view->info_usuario = $usuarios->getInfoUser();
-            $this->view->total_tweets = $usuarios->getTotalTweets();
-            $this->view->total_seguidores = $usuarios->getTotalSeguidores();
-            $this->view->total_seguindo = $usuarios->getTotalSeguindo();
+        //dados do user
+        $this->view->info_usuario = $usuarios->getInfoUser();
+        $this->view->total_tweets = $usuarios->getTotalTweets();
+        $this->view->total_seguidores = $usuarios->getTotalSeguidores();
+        $this->view->total_seguindo = $usuarios->getTotalSeguindo();
+        $this->view->foto_perfil = $usuarios->getImgUser();
 
     }
 
+    public function foto_edit()
+    {
+        $usuarios = Container::getModel('Usuarios');
+        $usuarios->__set('id', $_GET['id']);
+ 
+        $arquivo = $_FILES['arquivo'];
+        //salvando imagens
+        echo '<pre>';
+        print_r($arquivo);
+        echo '</pre>';
+        
+        
+
+        $pasta = "img/";
+        $arquivo_nome = $arquivo['name'];
+        $novoNomeArquivo = uniqid();
+        $extensao = strtolower(pathinfo($arquivo_nome, PATHINFO_EXTENSION)); //formato do arquivo(.jpg,.pdf,.png ...)
+
+        if ($extensao != 'png' && $extensao != 'jpg' && $arquivo['name'] != '' && $extensao != 'jpeg') {
+            header('Location: /timeline?img_erro=formatoInvalido');
+
+        } else if ($arquivo['size'] > 2097157 && $arquivo['name'] != '') {
+            header('Location: /timeline?img_erro=tamanhoMaximoUltrapassado');
+        } else {
+
+            $caminho = "$pasta$novoNomeArquivo.$extensao";
+
+            $deu_certo = move_uploaded_file($arquivo['tmp_name'], $pasta . $novoNomeArquivo . '.' . $extensao);
+            if($deu_certo){
+                $usuarios->__set('foto_perfil', $caminho);
+            }else{
+				$usuarios->__set('foto_perfil', "user_img/user_empty.jpg");
+			}
+
+            $usuarios->editar_foto();
+            
+
+        }
+
+    }
 }
 
 

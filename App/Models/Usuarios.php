@@ -9,6 +9,7 @@ class Usuarios extends Model {
     private $nome;
     private $email;
     private $senha;
+    private $foto_perfil;
 
     public function __get($atributo){
         return $this->$atributo;
@@ -19,11 +20,12 @@ class Usuarios extends Model {
     }
 
      public function salvar(){
-        $query = "INSERT INTO usuarios(nome,email,senha)VALUES(:nome,:email,:senha)";
+        $query = "INSERT INTO usuarios(nome,email,senha,foto_perfil)VALUES(:nome,:email,:senha,:foto_perfil)";
         $stmt = $this->db->prepare($query);
         $stmt->bindValue('nome', $this->__get('nome'));
         $stmt->bindValue('email', $this->__get('email'));
         $stmt->bindValue('senha', md5($this->__get('senha')));
+        $stmt->bindValue(':foto_perfil', $this->__get('foto_perfil'));
         $stmt->execute();
         return $this;
     }
@@ -79,7 +81,7 @@ class Usuarios extends Model {
     public function getAll(){
         $query = 
         "SELECT
-         u.id,u.nome,u.email,
+         u.id,u.nome,u.email, u.foto_perfil,
          (
             SELECT
             count(*)
@@ -129,6 +131,30 @@ class Usuarios extends Model {
         return $stmt->fetch(\PDO::FETCH_ASSOC);
 
     }
+
+    //selecionado e alterando imagem do usuario
+    public function getImgUser(){
+        $query = "SELECT foto_perfil FROM usuarios WHERE id = :id_usuario";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue('id_usuario', $this->__get('id'));
+        $stmt->execute();
+
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    }
+
+    public function editar_foto(){
+        $query = "UPDATE usuarios SET foto_perfil = :foto_perfil WHERE id = :id_usuario";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue('foto_perfil', $this->__get('foto_perfil'));
+        $stmt->bindValue('id_usuario', $this->__get('id'));
+        $stmt->execute();
+
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    }
+
+
 
     //Total de tweets do usuario
     public function getTotalTweets(){
