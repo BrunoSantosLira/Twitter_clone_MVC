@@ -54,23 +54,18 @@ class AppController extends Action
         $this->validarAutenticacao();
         $tweet = Container::getModel('Tweet');
 
-        $tweet->__set('tweet', $_POST['tweet']);
-        $tweet->__set('id_usuario', $_SESSION['id']);
+        $tweet->__set('tweet', $_GET['tweet']);
+        $tweet->__set('id_usuario', $_GET['id']);
 
 
         $arquivo = $_FILES['arquivo2'];
-        $arquivo_foto = $_FILES['arquivo'];
 
         //salvando imagens
         echo '<pre>';
         print_r($arquivo);
         echo '</pre>';
 
-        //salvando imagens
-        echo '<pre>';
-        print_r($arquivo_foto);
-        echo '</pre>';
-
+        
         $pasta = "img/";
         $arquivo_nome = $arquivo['name'];
         $novoNomeArquivo = uniqid();
@@ -93,7 +88,8 @@ class AppController extends Action
             //header("Location: /img/img.png"); endereço da imagem
 
             $tweet->salvar();
-            header('Location: /timeline');
+            $this->timeline();
+            
         }
     }
 

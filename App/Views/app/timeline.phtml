@@ -65,9 +65,9 @@
 			<div class="row mb-2">
 				<div class="col tweetBox">
 					<form name="arquivo2" id="arquivo2" method="post" action="/tweet" enctype="multipart/form-data">
-						<textarea class="form-control" name="tweet" id="exampleFormControlTextarea1" rows="3"></textarea>
+						<textarea class="form-control" name="tweet" id="texto_tweet" rows="3"></textarea>
 						
-						<input type="file" name="arquivo2" id="arquivo2" value="arquivo2">
+						<input type="file" name="img_post" id="img_post" value="arquivo2">
 
 						<?php if (isset($_GET['img_erro']) && $_GET['img_erro'] == 'formatoInvalido') { ?>
 							<p class="text-danger text-formted">Tipo de formato inválido!!! Por favor, adicione um png ou jpg.</p>
@@ -78,7 +78,7 @@
 
 						<div class="col mt-2 d-flex justify-content-end">
 				
-							<button type="submit"  class="btn btn-primary">Tweet</button>
+							<button type="submit" id="enviar_tweet"  class="btn btn-primary">Tweet</button>
 						</div>
 
 					</form>
@@ -98,7 +98,7 @@
 					</p>
 					<p><?php echo $tweet['tweet']?> </p>
 					<?php if ($tweet['path_imagem'] != null  ) { ?>
-						<img width="350px" src="<?php echo $tweet['path_imagem'] ?>" alt=""><br/>
+						<img width="200em" src="<?php echo $tweet['path_imagem'] ?>" alt=""><br/>
 						<a href="<?php echo $tweet['path_imagem']  ?>" target="_blank" rel="noopener noreferrer">Ver imagem -> </a>
 
 					<?php } ?>
@@ -176,5 +176,56 @@
 		}
 	}
 
+	$('#arquivo2').submit((e) =>{
+		e.preventDefault()
+		let texto = document.getElementById('texto_tweet').value
+		let img = e.target['1'].files['0']
+		
+		
+		var fd = new FormData();
+
+
+		fd.append("arquivo2", img);
+
+		
+
+		var ajax = new XMLHttpRequest();
+
+		ajax.onreadystatechange = function(){
+			if(ajax.readyState == 4 && ajax.status == 200){
+				window.location.reload()
+			}
+		}
+
+		ajax.open("POST",'\\tweet?id=<?php echo $_SESSION['id'] ?>&tweet='+texto,true)
+		ajax.send(fd);
+	
+	})
+	
+
+
+	/*
+		document.getElementById('arquivo2').onchange = function(e){
+		console.log(e.target.files[0])
+		let texto = document.getElementById('texto_tweet').value
+		if(e.target.files != null && e.target.files.length != 0){
+			var arquivo = e.target.files[0];
+			var fd = new FormData();
+
+			fd.append("arquivo2", arquivo);
+			var ajax = new XMLHttpRequest();
+
+			ajax.onreadystatechange = function(){
+				if(ajax.readyState == 4 && ajax.status == 200){
+					alert(ajax.responseText)
+				}
+			}
+
+			ajax.open("POST",'\\tweet?id=&tweet='+texto,true)
+			ajax.send(fd);
+			}
+		}*/
+
+	
 	
 </script>
