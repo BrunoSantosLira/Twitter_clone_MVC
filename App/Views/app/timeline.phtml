@@ -19,19 +19,14 @@
 		<div class="col-md-3">
 			<!-- <img width="255px" height="95px" src="<?//php echo $this->view->foto_perfil['foto_perfil'] ?>" alt=""> -->
 			<div class="perfil">
-					<form method="post" enctype="multipart/form-data" action="\foto_edit?id=<?php echo $_SESSION['id'] ?>" class="text-center" >
+					<form name="arquivo1" id="arquivo1" method="post" enctype="multipart/form-data" action="\foto_edit?id=<?php echo $_SESSION['id'] ?>" class="text-center" >
 						<label for="arquivo"> 
 							<i class="fa-solid fa-pen"></i>
 						</label>
 						<input type="file" name="arquivo" id="arquivo" value="SELECT">
-
-							<div class="col d-flex justify-content-center">
-								<button type="submit" class="btn btn-dark" >Trocar</button>
-							</div>
-
 					</form>
 				<div class="text-center" style="margin-bottom: 15px;">
-					<img src="<?php echo $this->view->foto_perfil['foto_perfil'] ?>" style="width: 100; height: 100; border: 1px solid red; border-radius: 60px; padding:;">
+					<img id="foto_perfil" src="<?php echo $this->view->foto_perfil['foto_perfil'] ?>" style="width: 100; height: 100; border: 1px solid red; border-radius: 60px; padding:;">
 				</div>
 				
 				<div class="perfilPainel">
@@ -69,12 +64,10 @@
 		<div class="col-md-6">
 			<div class="row mb-2">
 				<div class="col tweetBox">
-					<form method="post" action="/tweet" enctype="multipart/form-data">
+					<form name="arquivo2" id="arquivo2" method="post" action="/tweet" enctype="multipart/form-data">
 						<textarea class="form-control" name="tweet" id="exampleFormControlTextarea1" rows="3"></textarea>
-						<label for="arquivo"> 
-							<i class="fa-solid fa-image"></i>
-						</label>
-						<input type="file" name="arquivo" id="arquivo" value="SELECT">
+						
+						<input type="file" name="arquivo2" id="arquivo2" value="arquivo2">
 
 						<?php if (isset($_GET['img_erro']) && $_GET['img_erro'] == 'formatoInvalido') { ?>
 							<p class="text-danger text-formted">Tipo de formato inválido!!! Por favor, adicione um png ou jpg.</p>
@@ -156,3 +149,32 @@
 
 	</div>
 </div>
+<script>
+	document.getElementById('arquivo').onchange = function(e){
+		var foto_perfil = document.getElementById('foto_perfil');
+		if(e.target.files != null && e.target.files.length != 0){
+			var arquivo = e.target.files[0];
+			var fd = new FormData();
+
+			fd.append("arquivo", arquivo);
+			var ajax = new XMLHttpRequest();
+
+			ajax.onreadystatechange = function(){
+				if(ajax.readyState == 4 && ajax.status == 200){
+					try{
+					let path_img = JSON.parse(ajax.responseText);
+					foto_perfil.src = path_img.foto_perfil;
+
+					}catch($Error){
+						alert('Formato não permitido')
+					}
+				}
+			}
+
+			ajax.open("POST",'\\foto_edit?id=<?php echo $_SESSION['id'] ?>',true)
+			ajax.send(fd);
+		}
+	}
+
+	
+</script>

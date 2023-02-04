@@ -50,7 +50,7 @@ class AppController extends Action
 
     public function tweet()
     {
-        session_start();
+      
         $this->validarAutenticacao();
         $tweet = Container::getModel('Tweet');
 
@@ -58,11 +58,17 @@ class AppController extends Action
         $tweet->__set('id_usuario', $_SESSION['id']);
 
 
-        $arquivo = $_FILES['arquivo'];
+        $arquivo = $_FILES['arquivo2'];
+        $arquivo_foto = $_FILES['arquivo'];
 
         //salvando imagens
         echo '<pre>';
         print_r($arquivo);
+        echo '</pre>';
+
+        //salvando imagens
+        echo '<pre>';
+        print_r($arquivo_foto);
         echo '</pre>';
 
         $pasta = "img/";
@@ -70,7 +76,7 @@ class AppController extends Action
         $novoNomeArquivo = uniqid();
         $extensao = strtolower(pathinfo($arquivo_nome, PATHINFO_EXTENSION)); //formato do arquivo(.jpg,.pdf,.png ...)
 
-        if ($extensao != 'png' && $extensao != 'jpg' && $arquivo['name'] != '') {
+        if ($extensao != 'png' && $extensao != 'jpg' && $arquivo['name'] != '' && $extensao != 'jpeg') {
             header('Location: /timeline?img_erro=formatoInvalido');
 
         } else if ($arquivo['size'] > 2097157 && $arquivo['name'] != '') {
@@ -172,17 +178,15 @@ class AppController extends Action
 
     public function foto_edit()
     {
+        header("Content-Type: application/json");
         $usuarios = Container::getModel('Usuarios');
         $usuarios->__set('id', $_GET['id']);
+        
  
         $arquivo = $_FILES['arquivo'];
         //salvando imagens
-        echo '<pre>';
-        print_r($arquivo);
-        echo '</pre>';
+       
         
-        
-
         $pasta = "img/";
         $arquivo_nome = $arquivo['name'];
         $novoNomeArquivo = uniqid();
@@ -205,7 +209,9 @@ class AppController extends Action
 			}
 
             $usuarios->editar_foto();
-            
+            $this->view->foto_perfil = $usuarios->getImgUser();
+            print_r(json_encode($this->view->foto_perfil));
+            //header('Location: \timeline');
 
         }
 

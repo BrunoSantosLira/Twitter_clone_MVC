@@ -134,6 +134,7 @@ class Usuarios extends Model {
 
     //selecionado e alterando imagem do usuario
     public function getImgUser(){
+        
         $query = "SELECT foto_perfil FROM usuarios WHERE id = :id_usuario";
         $stmt = $this->db->prepare($query);
         $stmt->bindValue('id_usuario', $this->__get('id'));

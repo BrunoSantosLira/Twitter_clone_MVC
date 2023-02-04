@@ -74,6 +74,17 @@ class Route extends Bootstrap {
 			'action' => 'foto_edit'
 		);
 
+		$routes['foto_edit2'] = array(
+			'route' => '/foto_edit_ajax',
+			'controller' => 'AJAXController',
+			'action' => 'foto_edit'
+		);
+
+		
+		
+
+	
+
 
 
 
