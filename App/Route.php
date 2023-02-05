@@ -80,6 +80,13 @@ class Route extends Bootstrap {
 			'action' => 'foto_edit'
 		);
 
+		$routes['getTweets'] = array(
+			'route' => '/getTweets',
+			'controller' => 'AppController',
+			'action' => 'getTweets'
+		);
+
+
 		
 		
 

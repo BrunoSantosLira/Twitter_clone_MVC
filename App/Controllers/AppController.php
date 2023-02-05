@@ -212,6 +212,42 @@ class AppController extends Action
         }
 
     }
+
+    public function getTweets(){
+        $this->validarAutenticacao();
+
+        $tweet = Container::getModel('Tweet');
+        $tweet->__set('id_usuario', $_SESSION['id']);
+
+        $tweets = $tweet->getAll();
+
+        $total_registros_pagina = 10;
+        $pagina = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+        $deslocamento = ($pagina - 1) * $total_registros_pagina; //expressão para calcular o deslocamento
+
+
+        /*
+        $total_registros_pagina = 10;
+        $deslocamento = 10;
+        $pagina = 2;
+        
+        $total_registros_pagina = 10;
+        $deslocamento = 20;
+        $pagina = 3;*/
+
+        $tweets = $tweet->getPorPagina($total_registros_pagina, $deslocamento);
+        $total_tweets = $tweet->getTotalRegistros();
+        $this->view->total_paginas = ceil($total_tweets['total'] / $total_registros_pagina);
+        $this->view->pagina_ativa = $pagina;
+
+
+
+        $this->view->tweets = $tweets;
+        print_r(json_encode($this->view->tweets));
+    
+        $this->getInfoUser();
+       
+    }
 }
 
 
