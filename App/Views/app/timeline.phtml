@@ -65,7 +65,8 @@
 			<div class="row mb-2">
 				<div class="col tweetBox">
 					<form name="arquivo2" id="arquivo2" method="post" action="/tweet" enctype="multipart/form-data">
-						<textarea class="form-control" name="tweet" id="texto_tweet" rows="3"></textarea>
+					
+						<textarea value='texto'  class="form-control" name="tweet" id="texto_tweet" rows="3"></textarea>
 						
 						<input type="file" name="img_post" id="img_post" value="arquivo2">
 
@@ -103,11 +104,11 @@
 						
 					<br />
 					<?php if ($tweet['id_usuario'] == $_SESSION['id']) { ?>
-					<form method="post" action="\remover_tweet?id=<?php echo $tweet['id'] ?>">
+					
 						<div class="col d-flex justify-content-end">
-							<button type="submit" class="btn btn-danger"><small>Remover</small></button>
+							<button id="remover" onclick="remover(<?php echo $tweet['id'] ?>)" type="button" class="btn btn-danger"><small>Remover</small></button>
 						</div>
-					</form>
+
 					<?php } ?>
 						
 				</div>
@@ -152,15 +153,17 @@
 <script>
 	var cont = 0;
 	$('#texto_tweet').emojioneArea({
-		pickerPosition: "bottom",
-		emojiPlaceholder: ":smile_cat:"
-	})
+		pickerPosition: 'bottom',
+	});
+
+
 
 
 	document.getElementById('arquivo').onchange = function(e){
 		var foto_perfil = document.getElementById('foto_perfil');
 		if(e.target.files != null && e.target.files.length != 0){
 			var arquivo = e.target.files[0];
+			console.log(arquivo)
 			var fd = new FormData();
 
 			fd.append("arquivo", arquivo);
@@ -185,9 +188,10 @@
 
 	$('#arquivo2').submit((e) =>{
 		e.preventDefault()
+
 		let texto = document.getElementById('texto_tweet').value
 		console.log(texto)
-		let img = e.target['1'].files['0']
+		let img = e.target[2].files[0]
 		
 		
 		var fd = new FormData();
@@ -198,7 +202,8 @@
 
 		ajax.onreadystatechange = function(){
 			if(ajax.readyState == 4 && ajax.status == 200){
-				document.getElementById('arquivo2').reset()	
+				document.querySelector('.emojionearea-editor').innerHTML = ''	
+				document.getElementById('arquivo2').reset()
 				getTweets()
 			}
 		}
@@ -207,6 +212,29 @@
 		ajax.send(fd);
 	
 	})
+
+
+	function remover(id){
+		$.ajax({
+			url: "\\remover_tweet",
+			method:'GET',
+			dataType: 'json',
+			data: {id: id}
+
+		}).done(function(result){
+			console.log(result);
+		})
+
+		getTweets();
+	}
+
+	
+
+
+
+
+
+
 	
 	function getTweets(){
 		var caixa = document.getElementById("caixa_tweets")
@@ -216,11 +244,13 @@
         dataType: 'json'
     }).done(function(result){
 		cont++
-		if(cont == 5){
+		if(cont == 10){
 			window.location.reload()
 		}
         console.log(result);
 		caixa.innerHTML = ''
+	
+		
 		
         for(let i = 0; i < result.length; i++){
 			let linha = document.createElement('div');
@@ -258,17 +288,20 @@
 			link_imagem.rel = 'noopener noreferrer'
 			link_imagem.innerHTML = '<br>Ver imagem ->'
 
-			let form_botao = document.createElement('form');
-			form_botao.method = 'post';
-			form_botao.action = `\\remover_tweet?id=${result[i]['id']}`
+			
 
 			let div_botao = document.createElement('div');
 			div_botao.className = 'col d-flex justify-content-end'
 
 
 			let botao_remover = document.createElement('button');
-			botao_remover.type = 'submit'
+			botao_remover.type = 'button'
 			botao_remover.className = 'btn btn-danger'
+			
+
+			botao_remover.onclick = function() {
+				remover(result[i]['id']);
+			}
 			botao_remover.innerHTML = '<small>REMOVER</small>'
 
 
@@ -284,8 +317,8 @@
 				coluna.appendChild(link_imagem)
 			}
 			if(result[i]['id_usuario'] == <?php echo $_SESSION['id'] ?>){
-				coluna.appendChild(form_botao)
-				form_botao.appendChild(div_botao)
+				coluna.appendChild(div_botao)
+				
 				div_botao.appendChild(botao_remover)
 			}
 
@@ -300,6 +333,7 @@
 
 	}
 
+	
 	
 /*
 //<//?php foreach ($this->view->tweets as $key => $tweet) { ?>

@@ -1,7 +1,8 @@
 {
 	"name": "miniframework",
 	"require": {
-		"php": ">= 7.0"
+		"php": ">= 7.0",
+		"mervick/emojionearea": "^3.0.0"
 	},
 	"authors": [
 		{

@@ -87,6 +87,13 @@ class Route extends Bootstrap {
 		);
 
 
+		$routes['getInfoUser'] = array(
+			'route' => '/getInfoUser',
+			'controller' => 'AppController',
+			'action' => 'getInfoUser'
+		);
+
+
 		
 		
 

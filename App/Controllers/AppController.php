@@ -146,7 +146,9 @@ class AppController extends Action
     public function remover_tweet()
     {
         $this->validarAutenticacao();
+        echo json_encode($_GET['id']);
 
+        
         $id_tweet = isset($_GET['id']) ? $_GET['id'] : '';
         $id_usuario = isset($_SESSION['id']) ? $_SESSION['id'] : '';
 
@@ -164,6 +166,7 @@ class AppController extends Action
         $usuarios->__set('id', $_SESSION['id']);
 
         //dados do user
+        
         $this->view->info_usuario = $usuarios->getInfoUser();
         $this->view->total_tweets = $usuarios->getTotalTweets();
         $this->view->total_seguidores = $usuarios->getTotalSeguidores();
