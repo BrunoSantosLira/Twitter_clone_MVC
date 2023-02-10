@@ -139,15 +139,45 @@
 
 
 		<div class="col-md-3">
+
 			<div class="quemSeguir">
 				<span class="quemSeguirTitulo">Quem seguir</span><br />
+		
+					<div class="input-group mb-3">
+						<input type="text" id="texto_pesquisar" class="form-control" name="pesquisarPor">
+						<div class="input-group-append">
+							<button class="btn btn-primary" type="button" onclick="listar_seguir()">Procurar</button>
+						</div>
+					</div>
+			
 				<hr />
+			
 				<div id="caixa_seguir">
 					
 				
 				</div>
 					<!-- <a href="/img/img.png">IMG </a> -->
 			</div>
+
+			<div class="quemSeguir" style="margin-top: 100px;">
+				<span class="quemSeguirTitulo">Seguindo</span><br />
+	
+					<div class="input-group mb-3">
+						<input type="text" id="texto_pesquisar_seguindo" class="form-control" name="pesquisarPor">
+						<div class="input-group-append">
+							<button class="btn btn-success" type="button" onclick="listar_seguindo()">Procurar</button>
+						</div>
+					</div>
+			
+				<hr />
+			
+				<div id="caixa_seguindo">
+					
+				
+				</div>
+					<!-- <a href="/img/img.png">IMG </a> -->
+			</div>
+
 		</div>
 
 	</div>
@@ -160,24 +190,58 @@
 		pickerPosition: 'bottom',
 	});
 
-	function quemSeguir(){
+	//listando seguir e seguindo ao recarregar
+	listar_seguir()
+	listar_seguindo()
+
+	//funções que ennviar informações
+	function listar_seguir(){
+		
+		let pesquisa = $('#texto_pesquisar').val();
+		console.log(pesquisa)
+
+		let tipo_pesquisa = 0
+		quemSeguir(pesquisa, tipo_pesquisa)
+
+	}
+
+	function listar_seguindo(){
+		let pesquisa = $('#texto_pesquisar_seguindo').val();
+		console.log(pesquisa)
+
+		let tipo_pesquisa = 1
+		quemSeguir(pesquisa,tipo_pesquisa)
+	}
+
+	//função responsável por criar e colocar objetos no front
+	function quemSeguir(pesquisa,tipo_pesquisa){
+		if(tipo_pesquisa == 0){
+			document.getElementById('caixa_seguir').innerHTML = ''
+		}else if(tipo_pesquisa == 1){
+			document.getElementById('caixa_seguindo').innerHTML = ''
+		}
+	
 		var caixa = document.getElementById('caixa_seguir');
+		var caixa_seguindo = document.getElementById('caixa_seguindo'); 
+
 		$.ajax({
 			url: "\\quemSeguir",
 			method: 'GET',
 			dataType: 'json',
+			data: {pesquisarPor: pesquisa}
 			
 		}).done(function(result){
-			
+			console.log(result)
 			for(let i = 0; i < result.length; i++){
 				let linha = document.createElement('div');
-				linha.className = 'row mt-2 border'
+				linha.className = 'row mt-2'
 
 				let coluna = document.createElement('div');
 
 
 				let imagem = document.createElement('img');
-				imagem.style.width = '3em'
+				imagem.style.width = '2em'
+				imagem.style.height = '2em'
 				imagem.style.borderRadius = '30px'
 				imagem.src = result[i]['foto_perfil']
 				imagem.className = 'ml-2'
@@ -194,13 +258,28 @@
 				let botao = document.createElement('button')
 				botao.innerHTML = 'Seguir'
 				botao.style.float = 'left'
-				botao.className = 'btn btn-success'
+				botao.className = 'btn btn-success btn-sm'
 
+				let botao_deixarDeSeguir = document.createElement('button')
+				botao_deixarDeSeguir.innerHTML = 'Deixar de seguir'
+				botao_deixarDeSeguir.style.float = 'left'
+				botao_deixarDeSeguir.className = 'btn btn-danger btn-sm'
+
+			if(result[i]['seguindo_sn'] == 0 && tipo_pesquisa == 0){
 				caixa.appendChild(linha)
 				linha.appendChild(coluna)
 				coluna.appendChild(imagem)
 				coluna.appendChild(nome)
 				coluna.appendChild(botao)
+
+			}else if(result[i]['seguindo_sn'] == 1 && tipo_pesquisa == 1){
+				caixa_seguindo.appendChild(linha)
+				linha.appendChild(coluna)
+				coluna.appendChild(imagem)
+				coluna.appendChild(nome)
+				coluna.appendChild(botao_deixarDeSeguir)
+			}	
+				
 				
 				
 
@@ -208,9 +287,7 @@
 		})
 	}
 
-
-
-
+	//função AJAX responsável por trocar a foto de perfil
 	document.getElementById('arquivo').onchange = function(e){
 		var foto_perfil = document.getElementById('foto_perfil');
 		quemSeguir()
@@ -240,10 +317,10 @@
 		}
 	}
 
+	//função responsável por enviar tweet(AJAX)
 	$('#arquivo2').submit((e) =>{
 		e.preventDefault()
-		quemSeguir()
-
+	
 		let texto = document.getElementById('texto_tweet').value
 		console.log(texto)
 		let img = e.target[2].files[0]
@@ -269,7 +346,7 @@
 	
 	})
 
-
+	//função que remove tweet(AJAX)
 	function remover(id){
 		$.ajax({
 			url: "\\remover_tweet",
@@ -285,6 +362,7 @@
 		getTweets();
 	}
 
+	//função que pega as informações do user e as deixam dinâmicas(AJAX)
 	function getInfo(){
 		$.ajax({
 			url: '\\getInfoUserAJAX',
@@ -303,7 +381,7 @@
 
 
 
-	
+	//função responsável por recarregar os tweets na página(AJAX)
 	function getTweets(){
 		var caixa = document.getElementById("caixa_tweets")
 		$.ajax({
