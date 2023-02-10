@@ -106,6 +106,7 @@ class AppController extends Action
         $this->validarAutenticacao();
 
 
+        
         $pesquisarPor = isset($_GET['pesquisarPor']) ? $_GET['pesquisarPor'] : '';
 
         $usuario = Container::getModel('Usuarios');
@@ -115,11 +116,11 @@ class AppController extends Action
 
 
         $this->view->usuarios = $usuarios;
-
-
+       
+        print_r(json_encode($usuarios));
         $this->getInfoUser();
 
-        $this->render('quemSeguir');
+        //$this->render('quemSeguir');*/
     }
 
     public function acao()
@@ -172,6 +173,24 @@ class AppController extends Action
         $this->view->total_seguidores = $usuarios->getTotalSeguidores();
         $this->view->total_seguindo = $usuarios->getTotalSeguindo();
         $this->view->foto_perfil = $usuarios->getImgUser();
+
+    }
+
+
+    public function getInfoUserAJAX(){
+        $usuarios = Container::getModel('Usuarios');
+        $usuarios->__set('id', $_GET['id']);
+
+        $listaINFO = array(
+            $usuarios->getTotalTweets(),
+            $usuarios->getTotalSeguindo(),
+            $usuarios->getTotalSeguidores()
+            
+        );
+
+        print_r( json_encode($listaINFO));
+        
+  
 
     }
 

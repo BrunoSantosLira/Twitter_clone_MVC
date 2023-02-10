@@ -41,7 +41,7 @@
 
 						<div class="col">
 							<span class="perfilPainelItem">Tweets</span><br />
-							<span class="perfilPainelItemValor"><?php echo $this->view->total_tweets['total_tweets'] ?></span>
+							<span id="tweets" class="perfilPainelItemValor"><?php echo $this->view->total_tweets['total_tweets'] ?></span>
 						</div>
 
 						<div class="col">
@@ -142,13 +142,17 @@
 			<div class="quemSeguir">
 				<span class="quemSeguirTitulo">Quem seguir</span><br />
 				<hr />
-				<a href="\quemSeguir" class="quemSeguirTxt">Procurar por pessoas conhecidas</a>
-				<!-- <a href="/img/img.png">IMG </a> -->
+				<div id="caixa_seguir">
+					
+				
+				</div>
+					<!-- <a href="/img/img.png">IMG </a> -->
 			</div>
 		</div>
 
 	</div>
 </div>
+
 
 <script>
 	var cont = 0;
@@ -156,11 +160,60 @@
 		pickerPosition: 'bottom',
 	});
 
+	function quemSeguir(){
+		var caixa = document.getElementById('caixa_seguir');
+		$.ajax({
+			url: "\\quemSeguir",
+			method: 'GET',
+			dataType: 'json',
+			
+		}).done(function(result){
+			
+			for(let i = 0; i < result.length; i++){
+				let linha = document.createElement('div');
+				linha.className = 'row mt-2 border'
+
+				let coluna = document.createElement('div');
+
+
+				let imagem = document.createElement('img');
+				imagem.style.width = '3em'
+				imagem.style.borderRadius = '30px'
+				imagem.src = result[i]['foto_perfil']
+				imagem.className = 'ml-2'
+				
+				
+
+				let nome = document.createElement('span');
+				nome.innerHTML = result[i]['nome']
+				nome.className = 'ml-2'
+
+				let div_botao = document.createElement('div')
+				
+
+				let botao = document.createElement('button')
+				botao.innerHTML = 'Seguir'
+				botao.style.float = 'left'
+				botao.className = 'btn btn-success'
+
+				caixa.appendChild(linha)
+				linha.appendChild(coluna)
+				coluna.appendChild(imagem)
+				coluna.appendChild(nome)
+				coluna.appendChild(botao)
+				
+				
+
+			}
+		})
+	}
+
 
 
 
 	document.getElementById('arquivo').onchange = function(e){
 		var foto_perfil = document.getElementById('foto_perfil');
+		quemSeguir()
 		if(e.target.files != null && e.target.files.length != 0){
 			var arquivo = e.target.files[0];
 			console.log(arquivo)
@@ -183,11 +236,13 @@
 
 			ajax.open("POST",'\\foto_edit?id=<?php echo $_SESSION['id'] ?>',true)
 			ajax.send(fd);
+			
 		}
 	}
 
 	$('#arquivo2').submit((e) =>{
 		e.preventDefault()
+		quemSeguir()
 
 		let texto = document.getElementById('texto_tweet').value
 		console.log(texto)
@@ -204,7 +259,8 @@
 			if(ajax.readyState == 4 && ajax.status == 200){
 				document.querySelector('.emojionearea-editor').innerHTML = ''	
 				document.getElementById('arquivo2').reset()
-				getTweets()
+				getInfo();
+				getTweets();
 			}
 		}
 
@@ -225,12 +281,24 @@
 			console.log(result);
 		})
 
+		getInfo();
 		getTweets();
 	}
 
-	
+	function getInfo(){
+		$.ajax({
+			url: '\\getInfoUserAJAX',
+			method: 'GET',
+			dataType: 'json',
+			data: {id: <?php echo $_SESSION['id'] ?>}
+		}).done(function(result){
+		
+			console.log(result)
+			$('#tweets').html(result[0]['total_tweets'])
 
+		})
 
+	}
 
 
 
@@ -249,7 +317,7 @@
 		}
         console.log(result);
 		caixa.innerHTML = ''
-	
+		
 		
 		
         for(let i = 0; i < result.length; i++){
@@ -311,7 +379,9 @@
 			paragrafo_1.appendChild(imagem_perfil)
 			paragrafo_1.appendChild(paragrafo_2)
 			paragrafo_1.appendChild(data)
+
 			coluna.appendChild(tweet_paragrafo3)
+
 			if(result[i]['path_imagem'] != null){
 				coluna.appendChild(imagem_post)
 				coluna.appendChild(link_imagem)
