@@ -110,6 +110,15 @@ class Tweet extends Model{
 
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
+
+    public function curtir_post(){
+        $query = "INSERT INTO curtidas(id_usuario,id_tweet)VALUES(:id_usuario,:id_tweet)";
+        $stmt  = $this->db->prepare($query);
+        $stmt->bindValue(':id_usuario', $this->__get('id_usuario'));
+        $stmt->bindValue(':id_tweet',$this->__get('id'));
+        $stmt->execute();
+    }
+
 }
 
 ?>

@@ -93,6 +93,14 @@ class Route extends Bootstrap {
 			'action' => 'getInfoUserAJAX'
 		);
 
+		$routes['curtir_post'] = array(
+			'route' => '/curtir_post',
+			'controller' => 'AppController',
+			'action' => 'curtir_post'
+		);
+
+
+
 
 		
 		

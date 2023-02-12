@@ -130,6 +130,9 @@ class AppController extends Action
         $acao = isset($_GET['acao']) ? $_GET['acao'] : '';
         $id_usuario_seguindo = isset($_GET['id_usuario']) ? $_GET['id_usuario'] : '';
 
+       
+     
+      
         $usuario = Container::getModel('Usuarios');
         $usuario->__set('id', $_SESSION['id']);
 
@@ -139,8 +142,8 @@ class AppController extends Action
         if ($acao == 'deixar_de_seguir') {
             $usuario->deixarSeguirUsuario($id_usuario_seguindo);
         }
-
-        header('Location: \quemSeguir');
+        echo json_encode('oiii');
+        //header('Location: \quemSeguir');
 
     }
 
@@ -157,7 +160,7 @@ class AppController extends Action
         $tweet->__set('id', $id_tweet);
 
         $tweet->remover($id_usuario);
-        header('Location: \timeline');
+        //header('Location: \timeline');
     }
 
     public function getInfoUser()
@@ -267,9 +270,22 @@ class AppController extends Action
         $this->view->tweets = $tweets;
         print_r(json_encode($this->view->tweets));
     
-        $this->getInfoUser();
-       
+        $this->getInfoUser();  
     }
+
+    public function curtir_post(){
+        $tweet = Container::getModel('Tweet');
+
+        $tweet->__set('id', $_GET['id_post']);
+        $tweet->__set('id_usuario', $_GET['id_usuario']);
+
+        $tweet->curtir_post();
+        echo json_encode('oii');
+    }
+
+    
+
+
 }
 
 

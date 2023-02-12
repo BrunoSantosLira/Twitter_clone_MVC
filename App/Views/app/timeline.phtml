@@ -46,7 +46,7 @@
 
 						<div class="col">
 							<span class="perfilPainelItem">Seguindo</span><br />
-							<span class="perfilPainelItemValor"><?php echo $this->view->total_seguindo['total_seguindo'] ?></span>
+							<span class="perfilPainelItemValor" id="seguindo"><?php echo $this->view->total_seguindo['total_seguindo'] ?></span>
 						</div>
 
 						<div class="col">
@@ -101,7 +101,8 @@
 						<a href="<?php echo $tweet['path_imagem'] ?>" target="_blank" rel="noopener noreferrer">Ver imagem -> </a>
 
 					<?php } ?>
-						
+						<i class="fa-regular fa-heart" onclick="console.log('Antes de recarregar')"></i>	
+						<span>0</span>
 					<br />
 					<?php if ($tweet['id_usuario'] == $_SESSION['id']) { ?>
 					
@@ -194,6 +195,7 @@
 	listar_seguir()
 	listar_seguindo()
 
+
 	//funções que ennviar informações
 	function listar_seguir(){
 		
@@ -266,6 +268,19 @@
 				botao_deixarDeSeguir.className = 'btn btn-danger btn-sm'
 
 			if(result[i]['seguindo_sn'] == 0 && tipo_pesquisa == 0){
+				botao.onclick = function(){
+					$.ajax({
+						url: '\\acao',
+						method: 'GET',
+						data: {acao: 'seguir', id_usuario: result[i]['id']},
+						dataType: 'json'
+					}).done(function(result){
+						listar_seguir()
+						listar_seguindo()
+						getInfo('seguindo')
+					})
+				}
+
 				caixa.appendChild(linha)
 				linha.appendChild(coluna)
 				coluna.appendChild(imagem)
@@ -273,6 +288,19 @@
 				coluna.appendChild(botao)
 
 			}else if(result[i]['seguindo_sn'] == 1 && tipo_pesquisa == 1){
+				botao_deixarDeSeguir.onclick = function(){
+					$.ajax({
+						url: '\\acao',
+						method: 'GET',
+						data: {acao: 'deixar_de_seguir', id_usuario: result[i]['id']},
+						dataType: 'json'
+					}).done(function(result){
+						listar_seguir()
+						listar_seguindo()
+						getInfo('seguindo')
+					})
+				}
+
 				caixa_seguindo.appendChild(linha)
 				linha.appendChild(coluna)
 				coluna.appendChild(imagem)
@@ -336,7 +364,7 @@
 			if(ajax.readyState == 4 && ajax.status == 200){
 				document.querySelector('.emojionearea-editor').innerHTML = ''	
 				document.getElementById('arquivo2').reset()
-				getInfo();
+				getInfo('tweets');
 				getTweets();
 			}
 		}
@@ -358,21 +386,25 @@
 			console.log(result);
 		})
 
-		getInfo();
+		getInfo('tweets');
 		getTweets();
 	}
 
 	//função que pega as informações do user e as deixam dinâmicas(AJAX)
-	function getInfo(){
+	function getInfo(acao){
 		$.ajax({
 			url: '\\getInfoUserAJAX',
 			method: 'GET',
 			dataType: 'json',
 			data: {id: <?php echo $_SESSION['id'] ?>}
 		}).done(function(result){
-		
+			if(acao == 'tweets'){
+				$('#tweets').html(result[0]['total_tweets'])
+			}else if(acao == 'seguindo'){
+				$('#seguindo').html(result[1]['total_seguindo'])
+			}
 			console.log(result)
-			$('#tweets').html(result[0]['total_tweets'])
+
 
 		})
 
@@ -443,12 +475,28 @@
 			let botao_remover = document.createElement('button');
 			botao_remover.type = 'button'
 			botao_remover.className = 'btn btn-danger'
-			
-
 			botao_remover.onclick = function() {
 				remover(result[i]['id']);
 			}
 			botao_remover.innerHTML = '<small>REMOVER</small>'
+
+			let curtidas_icon = document.createElement('i');
+			curtidas_icon.className = 'fa-regular fa-heart mr-1';
+			curtidas_icon.onclick = function(){
+				$.ajax({
+					url: '\\curtir_post',
+					method: 'GET',
+					data: {id_usuario: result[i]['id_usuario'], id_post: result[i]['id']},
+					dataType: 'json'
+				}).done(function(result){
+					console.log(result)
+				})
+
+			}
+
+			let curtidas = document.createElement('span')
+			curtidas.innerHTML = 0
+
 
 
 			caixa.appendChild(linha)
@@ -459,6 +507,10 @@
 			paragrafo_1.appendChild(data)
 
 			coluna.appendChild(tweet_paragrafo3)
+
+
+			coluna.appendChild(curtidas_icon)
+			coluna.appendChild(curtidas)
 
 			if(result[i]['path_imagem'] != null){
 				coluna.appendChild(imagem_post)
@@ -481,43 +533,4 @@
 
 	}
 
-	
-	
-/*
-//<//?php foreach ($this->view->tweets as $key => $tweet) { ?>
-
-$('#caixa_tweets').prepend(
-	'<div class="row tweet" ><div class="col"> <p> <!-- Foto do perfil --><img style="width: 50px; height: 50px; border-radius:25px;" src="<?php echo $tweet['foto_perfil'] ?>" alt=""> <strong><?php echo $tweet['nome'] ?></strong> <span class="text text-muted">- <?php echo $tweet['data'] ?></span>  </p> <p><?php echo $tweet['tweet'] ?> </p> <?php if ($tweet['path_imagem'] != null) { ?> <img width="200em" src="<?php echo $tweet['path_imagem'] ?>" alt=""><br/> <a href="<?php echo $tweet['path_imagem'] ?>" target="_blank" rel="noopener noreferrer">Ver imagem -> </a> <?php } ?> <?php if ($tweet['id_usuario'] == $_SESSION['id']) { ?> <form method="post" action="\remover_tweet?id=<?php echo $tweet['id'] ?>"> <div class="col d-flex justify-content-end"> <button type="submit" class="btn btn-danger"><small>Remover</small></button> </div> </form> 	<?php } ?> </div></div></div></div>'
-	
-)
-
-<//?php } ?>
-
-*/
-
-
-	/*
-		document.getElementById('arquivo2').onchange = function(e){
-		console.log(e.target.files[0])
-		let texto = document.getElementById('texto_tweet').value
-		if(e.target.files != null && e.target.files.length != 0){
-			var arquivo = e.target.files[0];
-			var fd = new FormData();
-
-			fd.append("arquivo2", arquivo);
-			var ajax = new XMLHttpRequest();
-
-			ajax.onreadystatechange = function(){
-				if(ajax.readyState == 4 && ajax.status == 200){
-					alert(ajax.responseText)
-				}
-			}
-
-			ajax.open("POST",'\\tweet?id=&tweet='+texto,true)
-			ajax.send(fd);
-			}
-		}*/
-
-	
-	
 </script>
