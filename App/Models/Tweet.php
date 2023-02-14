@@ -21,7 +21,7 @@ class Tweet extends Model{
 
     //salvar
     public function salvar(){
-        $query = "INSERT INTO tweets(id_usuario,tweet,path_imagem)VALUES(:id_usuario, :tweet, :path_img)";
+        $query = "INSERT INTO tweets(id_usuario,tweet,path_imagem,curtidas)VALUES(:id_usuario, :tweet, :path_img, 0)";
         $stmt = $this->db->prepare($query);
         $stmt->bindValue(':id_usuario', $this->__get('id_usuario'));
         $stmt->bindValue(':tweet', $this->__get('tweet'));
@@ -43,7 +43,7 @@ class Tweet extends Model{
     public function getAll(){
         $query = 
         "SELECT
-        t.id, t.id_usuario, u.nome , u.foto_perfil , t.tweet, t.path_imagem, DATE_FORMAT(t.data, '%d - %m -%Y- %H : %i') as data
+        t.id, t.id_usuario, u.nome , u.foto_perfil , t.tweet, t.path_imagem, t.curtidas, DATE_FORMAT(t.data, '%d - %m -%Y- %H : %i') as data
 
         FROM 
         tweets as t
@@ -66,7 +66,7 @@ class Tweet extends Model{
     public function getPorPagina($limit,$offset){
         $query = 
         "SELECT
-        t.id, t.id_usuario, u.nome , t.tweet, u.foto_perfil , t.path_imagem, DATE_FORMAT(t.data, '%d - %m -%Y- %H : %i') as data
+        t.id, t.id_usuario, u.nome , t.tweet, u.foto_perfil , t.path_imagem, t.curtidas, DATE_FORMAT(t.data, '%d - %m -%Y- %H : %i') as data
 
         FROM 
         tweets as t
@@ -112,11 +112,21 @@ class Tweet extends Model{
     }
 
     public function curtir_post(){
-        $query = "INSERT INTO curtidas(id_usuario,id_tweet)VALUES(:id_usuario,:id_tweet)";
+        $query = "UPDATE tweets
+                SET curtidas = curtidas + 1
+                WHERE id= :id;";
+
         $stmt  = $this->db->prepare($query);
-        $stmt->bindValue(':id_usuario', $this->__get('id_usuario'));
-        $stmt->bindValue(':id_tweet',$this->__get('id'));
+        $stmt->bindValue(':id',$this->__get('id'));
         $stmt->execute();
+    }
+
+    public function get_curtidas(){
+        $query = 'SELECT curtidas FROM tweets WHERE id = :id_tweet';
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id_tweet', $this->__get('id'));
+        $stmt->execute();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
 }

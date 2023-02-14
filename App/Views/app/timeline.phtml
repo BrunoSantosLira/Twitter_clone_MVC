@@ -101,8 +101,10 @@
 						<a href="<?php echo $tweet['path_imagem'] ?>" target="_blank" rel="noopener noreferrer">Ver imagem -> </a>
 
 					<?php } ?>
-						<i class="fa-regular fa-heart" onclick="console.log('Antes de recarregar')"></i>	
-						<span>0</span>
+						<p>
+							<i class="fa-regular fa-heart" onclick="console.log('Antes de recarregar')"></i>	
+							<span>0</span>
+						</p>
 					<br />
 					<?php if ($tweet['id_usuario'] == $_SESSION['id']) { ?>
 					
@@ -191,9 +193,11 @@
 		pickerPosition: 'bottom',
 	});
 
+
 	//listando seguir e seguindo ao recarregar
 	listar_seguir()
 	listar_seguindo()
+
 
 
 	//funções que ennviar informações
@@ -480,6 +484,12 @@
 			}
 			botao_remover.innerHTML = '<small>REMOVER</small>'
 
+			let paragrafo_curtidas = document.createElement('p')
+
+			
+			let curtidas = document.createElement('span')
+			curtidas.innerHTML = result[i]['curtidas']
+
 			let curtidas_icon = document.createElement('i');
 			curtidas_icon.className = 'fa-regular fa-heart mr-1';
 			curtidas_icon.onclick = function(){
@@ -489,13 +499,13 @@
 					data: {id_usuario: result[i]['id_usuario'], id_post: result[i]['id']},
 					dataType: 'json'
 				}).done(function(result){
+					console.log('oii')
 					console.log(result)
+					curtidas.innerHTML = result['curtidas'];
 				})
 
 			}
 
-			let curtidas = document.createElement('span')
-			curtidas.innerHTML = 0
 
 
 
@@ -508,9 +518,10 @@
 
 			coluna.appendChild(tweet_paragrafo3)
 
-
-			coluna.appendChild(curtidas_icon)
-			coluna.appendChild(curtidas)
+			paragrafo_curtidas.appendChild(curtidas_icon)
+			paragrafo_curtidas.appendChild(curtidas)
+			
+			coluna.appendChild(paragrafo_curtidas)
 
 			if(result[i]['path_imagem'] != null){
 				coluna.appendChild(imagem_post)

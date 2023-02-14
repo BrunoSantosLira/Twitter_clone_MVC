@@ -280,7 +280,17 @@ class AppController extends Action
         $tweet->__set('id_usuario', $_GET['id_usuario']);
 
         $tweet->curtir_post();
-        echo json_encode('oii');
+        $curtidas = $tweet->get_curtidas();
+        print_r(json_encode($curtidas));
+    }
+
+    public function selecionar_curtidas(){
+        $tweet = Container::getModel('Tweet');
+
+        $tweet->__set('id', $_GET['id']);
+
+        $resultado = $tweet->get_curtidas();
+        print_r(json_encode($resultado));
     }
 
     

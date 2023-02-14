@@ -99,6 +99,12 @@ class Route extends Bootstrap {
 			'action' => 'curtir_post'
 		);
 
+		$routes['selecionar_curtidas'] = array(
+			'route' => '/selecionar_curtidas',
+			'controller' => 'AppController',
+			'action' => 'selecionar_curtidas'
+		);
+
 
 
 
