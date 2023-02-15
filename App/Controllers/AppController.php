@@ -275,13 +275,25 @@ class AppController extends Action
 
     public function curtir_post(){
         $tweet = Container::getModel('Tweet');
+        $this->validarAutenticacao();
 
         $tweet->__set('id', $_GET['id_post']);
-        $tweet->__set('id_usuario', $_GET['id_usuario']);
+        $tweet->__set('id_usuario', $_SESSION['id']);
 
         $tweet->curtir_post();
         $curtidas = $tweet->get_curtidas();
+        $total_curtidas = $tweet->verificarCurtida();
         print_r(json_encode($curtidas));
+    }
+
+    public function verificarPostCurtido(){
+        $tweet = Container::getModel('Tweet');
+        $this->validarAutenticacao();
+
+        $tweet->__set('id', $_GET['id_post']);
+        $tweet->__set('id_usuario', $_SESSION['id']);
+        $total_curtidas = $tweet->verificarCurtida();
+        print_r(json_encode($total_curtidas));
     }
 
     public function selecionar_curtidas(){

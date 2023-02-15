@@ -112,13 +112,38 @@ class Tweet extends Model{
     }
 
     public function curtir_post(){
-        $query = "UPDATE tweets
-                SET curtidas = curtidas + 1
-                WHERE id= :id;";
+        $total_curtidas = $this->verificarCurtida();
+        
+        if($total_curtidas['total'] < 1){
+            $this->adicionarCurtida();
+            $query = "UPDATE tweets
+                    SET curtidas = curtidas + 1
+                    WHERE id= :id;";
+    
+            $stmt  = $this->db->prepare($query);
+            $stmt->bindValue(':id',$this->__get('id'));
+            $stmt->execute();
+            
+        }
 
-        $stmt  = $this->db->prepare($query);
+    }
+
+    public function adicionarCurtida(){
+        $query = "INSERT INTO curtidas(id_usuario,id_tweet)VALUES(:id_usuario, :id)";
+        $stmt = $this->db->prepare($query);
         $stmt->bindValue(':id',$this->__get('id'));
+        $stmt->bindValue(':id_usuario', $this->__get('id_usuario'));
         $stmt->execute();
+    }
+
+    public function verificarCurtida(){
+        $query = 'SELECT COUNT(*) as total FROM curtidas WHERE id_tweet = :id AND id_usuario = :id_usuario;';
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id',$this->__get('id'));
+        $stmt->bindValue(':id_usuario', $this->__get('id_usuario'));
+        $stmt->execute();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+
     }
 
     public function get_curtidas(){

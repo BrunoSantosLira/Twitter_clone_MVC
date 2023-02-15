@@ -105,6 +105,12 @@ class Route extends Bootstrap {
 			'action' => 'selecionar_curtidas'
 		);
 
+		$routes['verificarPostCurtido'] = array(
+			'route' => '/verificarPostCurtido',
+			'controller' => 'AppController',
+			'action' => 'verificarPostCurtido'
+		);
+
 
 
 

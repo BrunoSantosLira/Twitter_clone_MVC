@@ -502,9 +502,21 @@
 					console.log('oii')
 					console.log(result)
 					curtidas.innerHTML = result['curtidas'];
+					curtidas_icon.className = 'fa-solid fa-heart mr-1';
 				})
 
 			}
+
+			$.ajax({
+				url: '\\verificarPostCurtido',
+				method: 'GET',
+				data: {id_post: result[i]['id']},
+				dataType: 'json'
+			}).done(function(result){
+				if(result['total'] >=1){
+					curtidas_icon.className = 'fa-solid fa-heart mr-1';
+				}
+			})
 
 
 
